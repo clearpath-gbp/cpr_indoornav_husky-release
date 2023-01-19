@@ -2,6 +2,11 @@
 Changelog for package cpr_indoornav_husky
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.4 (2023-01-19)
+------------------
+* Add the wifi_connected and wifi_connection topics that were missing by default
+* Contributors: Chris Iverach-Brereton
+
 0.3.3 (2022-11-24)
 ------------------
 * Add a block for wireless charge docking if necessary
