@@ -1,0 +1,63 @@
+ros-noetic-cpr-indoornav-husky (0.4.1-1focal) focal; urgency=high
+
+  * Swap the priorities of /cmd_vel and /manual/cmd_vel to enable teleop assist via the GUI
+  * Remove Config_extras export for outdoornav
+  * Contributors: Chris Iverach-Brereton, Michael Hosmar, José Mastrangelo
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Tue, 26 Mar 2024 04:00:00 -0000
+
+ros-noetic-cpr-indoornav-husky (0.4.0-1focal) focal; urgency=high
+
+  * Update to work with Otto's 2.26 release
+  * Add improved support for Husky Observer
+  * Contributors: Chris Iverach-Brereton, José Mastrangelo
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Thu, 04 Jan 2024 05:00:00 -0000
+
+ros-noetic-cpr-indoornav-husky (0.3.5-1focal) focal; urgency=high
+
+  * Fix the PI variable; husky_description uses M_PI, not PI
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Thu, 09 Mar 2023 05:00:00 -0000
+
+ros-noetic-cpr-indoornav-husky (0.3.4-1focal) focal; urgency=high
+
+  * Add the wifi_connected and wifi_connection topics that were missing by default
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Thu, 19 Jan 2023 05:00:00 -0000
+
+ros-noetic-cpr-indoornav-husky (0.3.3-1focal) focal; urgency=high
+
+  * Add a block for wireless charge docking if necessary
+  * Add the web GUI input
+  * Add the option to override the ROS2 bridge topics
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Thu, 24 Nov 2022 05:00:00 -0000
+
+ros-noetic-cpr-indoornav-husky (0.3.2-1focal) focal; urgency=high
+
+  * Fix the python interpreter to use Python3
+  * Contributors: Chris I-B
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Wed, 15 Jun 2022 04:00:00 -0000
+
+ros-noetic-cpr-indoornav-husky (0.3.1-1focal) focal; urgency=high
+
+  * Change the ROS1->2 bridge domain to 91.
+  * Fix a bug with the BRIDGE_SETUP_PATH envar
+  * Update the Husky graphics
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Fri, 03 Jun 2022 04:00:00 -0000
+
+ros-noetic-cpr-indoornav-husky (0.3.0-1focal) focal; urgency=high
+
+  * Initial public release
+  * Contributors: Chris Iverach-Brereton
+
+ -- Chris Iverach-Brereton <civerachb@clearpathrobotics.com>  Fri, 06 May 2022 04:00:00 -0000
+
+
