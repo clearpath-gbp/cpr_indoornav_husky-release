@@ -2,6 +2,12 @@
 Changelog for package cpr_indoornav_husky
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2024-05-27)
+------------------
+* Use galactic by default
+* Modify the husky power monitor node to subscribe to multiple inputs to more gracefully handle lithium battery upgrades
+* Contributors: Chris Iverach-Brereton
+
 0.4.1 (2024-03-26)
 ------------------
 * Swap the priorities of /cmd_vel and /manual/cmd_vel to enable teleop assist via the GUI
