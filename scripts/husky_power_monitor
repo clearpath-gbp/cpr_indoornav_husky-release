@@ -6,52 +6,94 @@ from husky_msgs.msg import HuskyStatus as Status
 from sensor_msgs.msg import BatteryState
 from std_msgs.msg import Header
 
-NaN = float('nan')
+from math import nan as NaN
 
-def status_cb(data, node):
-    node.status_callback(data)
+# Support different possible battery sources in increasing levels of priority
+BATTERY_SOURCE_MCU = 0       # estimate SLA level from MCU voltage (least accurate)
+BATTERY_SOURCE_LITHIUM = 1   # standard Husky lithium upgrade
+BATTERY_SOURCE_PDU = 2       # husky observer PDU & BMS
+
+MAX_SAMPLES = 5
+
+def median(l):
+    if len(l) == 0:
+        return 0
+
+    arr = [x for x in l]
+    arr.sort()
+    return arr[len(arr)//2]
 
 class PowerStatusRelayNode:
     def __init__(self):
         rospy.init_node('husky_power_monitor')
 
+        self.battery_source = BATTERY_SOURCE_MCU
+
+        self.voltage_samples = []
+        self.percentage_samples = []
+
     def start(self):
-        self.mcu_sub = rospy.Subscriber('/status', Status, status_cb, self)
+        self.mcu_sub = rospy.Subscriber('/status', Status, self.status_callback)
+        self.bms_sub = rospy.Subscriber('/bms/battery_state', BatteryState, self.lithium_callback)
+        self.pdu_sub = rospy.Subscriber('/onboard_systems/bms_0/state', BatteryState, self.pdu_callback)
+
         self.battery_pub = rospy.Publisher('/bms/battery_status', BatteryState, queue_size=1)
 
     def status_callback(self, data):
-        msg = BatteryState()
+        if self.battery_source <= BATTERY_SOURCE_MCU:
+            self.voltage_samples.append(data.battery_voltage)
+            self.percentage_samples.append(data.charge_estimate)
 
-        # set up the message header
-        msg.header = Header()
-        msg.header.stamp = rospy.Time.now()
+            if len(self.voltage_samples) > MAX_SAMPLES:
+                self.voltage_samples.pop(0)
+            if len(self.percentage_samples) > MAX_SAMPLES:
+                self.percentage_samples.pop(0)
 
-        # fill the rest of the pertinent payload
-        msg.present = data.no_battery
-        msg.voltage = data.battery_voltage
-        msg.percentage = data.charge_estimate
-        msg.current = NaN
-        msg.power_supply_status = msg.POWER_SUPPLY_STATUS_DISCHARGING  # no built-in charging!
-        msg.power_supply_health = msg.POWER_SUPPLY_HEALTH_UNKNOWN
-        msg.power_supply_technology = msg.POWER_SUPPLY_TECHNOLOGY_UNKNOWN
+            voltage = median(self.voltage_samples)
+            percent = median(self.percentage_samples)
 
-        # assume a single cell
-        msg.cell_voltage = [data.battery_voltage]
-        msg.cell_temperature = [NaN]
+            msg = BatteryState()
 
-        # arbitrary
-        msg.location = 'internal'
-        msg.serial_number = ''
+            # set up the message header
+            msg.header = Header()
+            msg.header.stamp = rospy.Time.now()
 
-        # measurements not supported by the Husky MCU
-        msg.charge = NaN
-        msg.capacity = NaN
-        msg.design_capacity = NaN
-        msg.temperature = NaN
+            # fill the rest of the pertinent payload
+            msg.present = data.no_battery
+            msg.voltage = voltage
+            msg.percentage = percent
+            msg.current = NaN
+            msg.power_supply_status = msg.POWER_SUPPLY_STATUS_DISCHARGING  # no built-in charging!
+            msg.power_supply_health = msg.POWER_SUPPLY_HEALTH_UNKNOWN
+            msg.power_supply_technology = msg.POWER_SUPPLY_TECHNOLOGY_UNKNOWN
 
+            # assume a single cell
+            msg.cell_voltage = [voltage]
+            msg.cell_temperature = [NaN]
 
-        # publish the message
-        self.battery_pub.publish(msg)
+            # arbitrary
+            msg.location = 'internal'
+            msg.serial_number = ''
+
+            # measurements not supported by the Husky MCU
+            msg.charge = NaN
+            msg.capacity = NaN
+            msg.design_capacity = NaN
+            msg.temperature = NaN
+
+            # publish the message
+            self.battery_pub.publish(msg)
+
+    def lithium_callback(self, data):
+        if self.battery_source <= BATTERY_SOURCE_LITHIUM:
+            self.battery_source = BATTERY_SOURCE_LITHIUM
+            self.battery_pub.publish(data)
+
+    def pdu_callback(self, data):
+        if self.battery_source <= BATTERY_SOURCE_PDU:
+            self.battery_source = BATTERY_SOURCE_PDU
+            self.battery_pub.publish(data)
+
 
 if __name__=='__main__':
     node = PowerStatusRelayNode()
